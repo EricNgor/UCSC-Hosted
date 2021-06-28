@@ -3,7 +3,7 @@
 This program simulates lottery drawings to more clearly illustrate the odds of winning the lottery. \
 The user may choose for the simulation to be run using either Powerball or Mega Millions rules.
 
-## [Try it out](http://people.ucsc.edu/~engor/Processing/Lotto/Lotto.html/)
+## [Try it out](http://people.ucsc.edu/~engor/Processing/Lotto/Lotto.html)
 
 ## Usage Notes
 * To switch between Powerball and Mega Millions, reload the page
