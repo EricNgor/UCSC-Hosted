@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Assignment 0</title>
+    </head>
+
+    <body onload="main()">
+        <canvas id="asg0" width="400" height="400">
+        Please use a browser that supports "canvas"
+        </canvas>
+        <!-- <label for="number">throw a number in here i guess</label>
+        <input type="number" id="number" name="number"> -->
+        <br>
+        <label>v1: x</label>
+        <input type="number" id="x"/>
+        <label>y</label>
+        <input type="number" id="y"/>
+
+        <br>
+        <label>v2: x</label>
+        <input type="number" id="x2"/>
+        <label>y</label>
+        <input type="number" id="y2"/>
+
+        <br>
+        <input type="button" id="draw" value="Draw">
+
+        <br><br>
+        <label>Operation:</label>
+        <select name="operation" id="op">
+            <option value="add">Add</option>
+            <option value="sub">Subtract</option>
+            <option value="mul">Multiply</option>
+            <option value="div">Divide</option>
+            <option value="angle">Angle between</option>
+            <option value="area">Area</option>
+            <option value="mag">Magnitude</option>
+            <option value="norm">Normalize</option>
+        </select>
+        <label>Scalar:</label>
+        <input type="number" id="scalar"/>
+
+        <br>
+        <input type="button" id="operation" value="Draw">
+
+        <script src="asg0.js"></script>
+        <script src="lib/cuon-matrix-cse160.js"></script>
+    </body>
+</html> 

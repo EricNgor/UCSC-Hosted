@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Assignment 3</title>
+  </head>
+
+  <body onload="main()">
+    <canvas id="asg3" width="800" height="800">
+      Please use a browser that supports "canvas"
+    </canvas>
+
+    </br>
+    Roaming <input type="radio" id="roaming" checked/>
+    Walking <input type="radio" id="walking"/>
+    <br>
+    Place/Destroy Blocks <input type="radio" id="editWorld" checked/>
+    None: <input type="radio" id="none"/>
+    <br><br>
+    Coords: <output id="coords"></output>
+    <br>
+    Speed: <output id="speed"></output>
+
+    <br><br>
+    <p>
+      Controls:
+      <ul>
+        <li>Toggle Camera mode with 'g'</li>
+        <li>Toggle world interactions with 'r'</li>
+          <ul><li>Place with RMB, Destroy with LMB</li></ul>
+        <li>Use scroll wheel to change speed</li>
+      </ul>
+        
+        
+    </p>
+
+    <script src="asg3.js"></script>
+    <script src="Cube.js"></script>
+    <script src="Triangle.js"></script>
+    <script src="camera.js"></script>
+    <script src="input.js"></script>
+    <script src="world.js"></script>
+
+    <!-- Load external libraries -->
+    <script src="lib/cuon-matrix-cse160.js"></script>
+    <script src="lib/cuon-utils.js"></script>
+    <script src="lib/webgl-debug.js"></script>
+    <script src="lib/webgl-utils.js"></script>
+    <script src="lib/perlin.js"></script>
+  </body>
+</html>

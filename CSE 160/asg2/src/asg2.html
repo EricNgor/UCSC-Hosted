@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8"/>
+        <title>Assignment 2</title>
+    </head>
+   
+    <body onload="main()">
+        <canvas id="asg2" width="600" height="600">
+            Please use a browser that supports "canvas"
+        </canvas>
+        
+        <!-- <div id="tool">
+            Coords: <output id="coords"></output> <br>
+            Insert Shape Tool <br>
+            X: <input type="number" id="toolX" min="-2" max="2" step="0.01" value="0"/>
+            Y: <input type="number" id="toolY" min="-2" max="2" step="0.01" value="0"/>
+            Z: <input type="number" id="toolZ" min="-2" max="2" step="0.01" value="0"/>
+            <br>
+            rotX: <input type="number" id="toolrotX" value="0"/> <br>
+            rotY: <input type="number" id="toolrotY" value="0"/> <br>
+            rotZ: <input type="number" id="toolrotZ" value="1"/>
+            <br>
+            scaleX: <input type="number" id="toolscaleX" min="-2" max="2" step="0.01" value="0.4"/>
+            scaleY: <input type="number" id="toolscaleY" min="-2" max="2" step="0.01" value="0.4"/>
+            scaleZ: <input type="number" id="toolscaleZ" min="-2" max="2" step="0.01" value="0.4"/>
+            <br>
+            Generic Modifier X: <input type="number" id="rotatorx" min="-360" max="360" step=".01" value="0"/> <br>
+            Generic Modifier Y: <input type="number" id="rotatory" min="-360" max="360" step=".01" value="0"/> <br>
+            Generic Modifier Z: <input type="number" id="rotatorz" min="-360" max="360" step=".01" value="0"/>
+            <br>
+            <input type="button" id="print" value="Print Shape Settings"/>
+        </div> -->
+
+        <br>
+        <input type="button" id="toggle" value="Toggle Animation"/>
+        <br>
+        <br>
+        Left Arm joint: <input type="range" id="armsLSlide" min="-15" max="15" value="0"/>
+        Right Arm joint: <input type="range" id="armsRSlide" min="-15" max="15" value="0"/>
+
+        <br><br>
+        Viewing Angle: <output id="angleDisplay"></output>
+        <br>
+        <input type="button" id="resetAngle" value="Reset Angle"/>
+
+        <br>
+        <p>
+            Adjust viewing angle by dragging cursor around screen
+        </p>
+
+        <script src="../lib/webgl-utils.js"></script>
+        <script src="../lib/webgl-debug.js"></script>
+        <script src="../lib/cuon-utils.js"></script>
+        <script src="../lib/cuon-matrix-cse160.js"></script>
+        <script src="Triangle.js"></script>
+        <script src="Cube.js"></script>
+        <script src="asg2.js"></script>
+
+    </body>
+
+
+</html>

@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8"/>
+        <title>Assignment 5</title>
+    </head>
+    <body>
+        <canvas id="asg5" tabindex="0">
+            Please use a browser that supports "canvas"
+        </canvas>
+        <div id="views" class="split">
+            <div id="view1" tabindex="1" style="display: block"></div>
+            <div id="view2" tabindex="2" style="display: block"></div>
+        </div>
+    </body>
+    <style>
+        /* https://threejsfundamentals.org/threejs/lessons/threejs-fundamentals.html */
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+        #asg5 {
+            width: 100%;
+            height: 100%;
+            display: block;
+
+        }
+        /* https://threejsfundamentals.org/threejs/lessons/threejs-cameras.html */
+        .split {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+        }
+        .split>div {
+            width: 100%;
+            height: 100%;
+        }
+        .split>div:focus {
+            outline: none;
+        }
+    </style>
+
+<script src="./MinMaxGUIHelper.js"></script>
+<script src="./PickHelper.js"></script>
+    
+<script type="module">
+    // Eric Ngor (engor)
+    // CSE 160 - Fall 20
+    // import * as THREE from './three.module.js';
+    import * as THREE from 'https://threejsfundamentals.org/threejs/resources/threejs/r122/build/three.module.js';
+    import {OrbitControls} from 'https://threejsfundamentals.org/threejs/resources/threejs/r122/examples/jsm/controls/OrbitControls.js';
+    import {BufferGeometryUtils} from 'https://threejsfundamentals.org/threejs/resources/threejs/r122/examples/jsm/utils/BufferGeometryUtils.js';
+    import {OBJLoader2} from 'https://threejsfundamentals.org/threejs/resources/threejs/r122/examples/jsm/loaders/OBJLoader2.js';
+    import {MTLLoader} from 'https://threejsfundamentals.org/threejs/resources/threejs/r122/examples/jsm/loaders/MTLLoader.js';
+    import {MtlObjBridge} from 'https://threejsfundamentals.org/threejs/resources/threejs/r122/examples/jsm/loaders/obj2/bridge/MtlObjBridge.js';
+    import {GUI} from './lib/gui/dat.gui.module.js';
+
+    // Globals
+    const canvas = document.querySelector('#asg5');    
+    const view1Elem = document.querySelector('#view1');
+    const view2Elem = document.querySelector('#view2');
+    const renderer = new THREE.WebGLRenderer({canvas});
+    const loader = new THREE.TextureLoader();
+    const scene = new THREE.Scene();
+
+    // Flags
+    let secondCam = true;
+
+    // Camera
+    let camera;
+    {
+        const fov = 90;
+        const aspect = canvas.width / canvas.height; 
+        const near = 0.1; const far = 200;
+        camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+    }
+    const camPos = 15;
+    camera.position.set(0,camPos,0);
+    camera.lookAt(1,camPos,0);
+    const controls = new OrbitControls(camera, view1Elem);
+    controls.target.set(1,camPos,0);
+    controls.update();
+
+    const cameraHelper = new THREE.CameraHelper(camera);
+    scene.add(cameraHelper);
+
+    // Second Camera
+    let camera2;
+    {
+        const fov = 60;
+        const aspect = 2;
+        const near = 0.1; const far = 500;
+        camera2 = new THREE.PerspectiveCamera(fov, aspect, near, far);
+    }
+    camera2.position.set(camPos*2,camPos*2,camPos*2);
+    camera2.lookAt(0,5,0);
+    const controls2 = new OrbitControls(camera2, view2Elem);
+    controls2.target.set(0,camPos/2,0);
+    controls2.update();
+
+    {
+        const loader = new THREE.CubeTextureLoader();
+        const bkg = loader.load([  //+x,-x,+y,-y,+z,-y
+            //https://wallpaperaccess.com/purple-star
+            './resources/images/abyss.jpg',
+            './resources/images/abyss.jpg',
+            './resources/images/abyss.jpg',
+            './resources/images/abyss.jpg',
+            './resources/images/abyssf.jpg',
+            './resources/images/abyssf.jpg',
+        ]);
+        scene.background = bkg;
+    }
+
+    const gui = new GUI();
+    // Add camera settings
+    {
+        gui.add(camera, 'fov', 1, 180);
+        const minMaxGUIHelper = new MinMaxGUIHelper(camera, 'near', 'far', 0.1);
+        gui.add(minMaxGUIHelper, 'min', 0.1, 50, 0.1).name('near');
+        gui.add(minMaxGUIHelper, 'max', 0.1, 50, 0.1).name('far');
+    }
+
+    // Ambient Light
+    {
+        const color = 0xFFFFFF;
+        const intensity = 0.7;
+        const light = new THREE.AmbientLight(color, intensity);
+        scene.add(light);
+    }
+
+    // Point Light
+    {
+        const light = new THREE.PointLight(0xDDDD33, 1, 100);
+        light.position.set(-14,12,-14);
+        scene.add(light);
+    }
+
+    // Fog
+    const near = 1;
+    const far = 25;
+    const color = 'indigo';
+    scene.fog = new THREE.Fog(color, near, far);
+
+    // Load object
+    {
+        // https://leagueoflegends.fandom.com/wiki/Rek'Sai
+        // model by Riot Games
+        const obj = 'reksai';
+        const mtlLoader = new MTLLoader();
+        mtlLoader.load(`./resources/obj/${obj}/${obj}.mtl`, mtlParseResult => {
+            const objLoader = new OBJLoader2();
+            const materials = MtlObjBridge.addMaterialsFromMtlLoader(mtlParseResult);
+            for (const material of Object.values(materials)) {
+                material.side = THREE.DoubleSide;
+            }
+            objLoader.addMaterials(materials);
+            objLoader.load(`./resources/obj/${obj}/${obj}.obj`, root => {
+                root.position.set(14,10.5,10);
+                root.rotation.y = 5*Math.PI/4;
+                root.scale.set(1.5,1.5,1.5);
+                scene.add(root);
+            });
+        });
+    }
+
+    function setupEvents() {
+        // Camera toggle
+        window.addEventListener('keydown', e => {
+            if (e.key == 'c') {
+                secondCam = !secondCam;
+                GUI.toggleHide();
+                document.querySelector('#view2').style.display = secondCam ? 'block' : 'none';
+            }
+        });
+
+        // Picker
+        window.addEventListener('mousemove', setPickPosition);
+        window.addEventListener('mouseout', clearPickPosition);
+        window.addEventListener('mouseleave', clearPickPosition);
+        window.addEventListener('touchstart', evt => {
+            evt.preventDefault();
+            setPickPosition(evt.touches[0]);
+        }, {passive: false});
+        window.addEventListener('touchmove', evt => {
+            setPickPosition(evt.touches[0]);
+        });
+        window.addEventListener('touchend', clearPickPosition);
+        window.addEventListener('click', destroyBlock);
+    }
+
+    // https://threejsfundamentals.org/threejs/lessons/threejs-cameras.html
+    // set scissor and viewport to rectangle of element that overlaps the camera
+    function setScissorForElement(elem) {
+        const canvasRect = canvas.getBoundingClientRect();
+        const elemRect = elem.getBoundingClientRect();
+
+        // compute a canvas relative rectangle
+        const right = Math.min(elemRect.right, canvasRect.right) - canvasRect.left;
+        const left = Math.max(0, elemRect.left - canvasRect.left);
+        const bottom = Math.min(elemRect.bottom, canvasRect.bottom) - canvasRect.top;
+        const top = Math.max(0, elemRect.top - canvasRect.top);
+
+        const width = Math.min(canvasRect.width, right - left);
+        const height = Math.min(canvasRect.height, bottom - top);
+
+        // setup the scissor to only render to that part of the canvas
+        const positiveYUpBottom = canvasRect.height - bottom;
+        renderer.setScissor(left, positiveYUpBottom, width, height);
+        renderer.setViewport(left, positiveYUpBottom, width,  height);
+
+        // return the aspect
+        return width / height;
+    }
+
+    const pickPosition = {x:0, y:0};
+    const pickHelper = new PickHelper(THREE);
+    clearPickPosition();
+
+
+    let debris = [];
+
+    function render(time) {
+        function resizeRendererToDisplaySize(renderer) {
+            const canvas = renderer.domElement;
+            const width = canvas.clientWidth;
+            const height = canvas.clientHeight;
+            const needResize = canvas.width != width || canvas.height != height;
+            if (needResize) {
+                renderer.setSize(width, height, false);
+            }
+            return needResize;
+        }
+
+        time *= 0.001; 
+
+        // Pick block
+        pickHelper.pick(pickPosition, scene, camera, terrain);
+
+        resizeRendererToDisplaySize(renderer);
+
+        
+        // https://threejsfundamentals.org/threejs/lessons/threejs-cameras.html
+        // render original view
+        {
+            // Fog, only for main camera
+            scene.fog = new THREE.Fog(color, near, far);
+
+            const aspect = setScissorForElement(view1Elem);
+            // adjust camera for this aspect
+            camera.aspect = aspect;
+            camera.updateProjectionMatrix();
+            cameraHelper.update();
+            // don't draw the camera helper in the original view
+            cameraHelper.visible = false;
+
+            // render
+            renderer.render(scene, camera);
+        } 
+        // render from the 2nd camera
+        if (secondCam)
+        {  
+            // Remove fog from 2nd camera
+            scene.fog = new THREE.Fog(color, 0, 1200);
+
+            renderer.setScissorTest(true);
+            const aspect = setScissorForElement(view2Elem);
+            // adjust camera for this aspect;
+            camera2.aspect = aspect;
+            camera2.updateProjectionMatrix();
+            // draw the camera helper in the 2nd view
+            cameraHelper.visible = true;
+            renderer.render(scene, camera2);
+        }
+
+        debris.forEach((block, i) => {
+            block.rotation.x = time * (5+i) * .075;
+            block.rotation.y = time * (5+i) * .075;
+
+            // Orbit
+            if (i > 3*debris.length/4) {
+                block.position.x = Math.cos((time+i) / 4)*32;
+                block.position.y = Math.sin((time+i) / 4)*32;
+                block.position.z = Math.sin((time+i) / 4)*32;
+            } 
+            else if (i > debris.length/2) {
+                block.position.x = -Math.sin((time+i) / 4)*32;
+                block.position.y = Math.sin((time+i) / 4)*32;
+                block.position.z = -Math.cos((time+i) / 4)*32;
+            }
+            else if (i > debris/length/4) {
+                block.position.x = Math.sin((time+i) / 4)*32;
+                block.position.y = Math.sin((time+i) / 4)*32;
+                block.position.z = Math.cos((time+i) / 4)*32;
+            }
+            else {
+                block.position.x = -Math.cos((time+i) / 4)*32;
+                block.position.y = Math.sin((time+i) / 4)*32;
+                block.position.z = -Math.sin((time+i) / 4)*32;
+            }
+            block.position.y += 20;
+        });
+
+        requestAnimationFrame(render);
+    }
+
+    function setPickPosition(evt) {
+        pickPosition.x = (evt.clientX / window.innerWidth) * 2 - 1;
+        pickPosition.y = (evt.clientY / window.innerHeight) * -2 + 1;
+    }
+
+    function clearPickPosition() {
+        pickPosition.x = -100000;
+        pickPosition.y = -100000;
+    }
+
+    function destroyBlock() {
+        if (pickHelper.pickedObject) {
+            const block = pickHelper.pickedObject;
+            scene.remove(block);
+            const i = terrain.indexOf(block);
+            if (i>-1) terrain.splice(i,1);
+        }
+    }
+
+    const blockG = new THREE.BoxBufferGeometry(1,1,1);
+    const blackstone_tex = loader.load('./resources/images/blackstone.png');
+    blackstone_tex.magFilter = THREE.NearestFilter;
+
+    const obsidian_tex = loader.load('./resources/images/obsidian.jpg'); 
+    obsidian_tex.magFilter = THREE.NearestFilter;
+    
+    const crying_obsidian_tex = loader.load('./resources/images/crying_obsidian.jpg');
+    crying_obsidian_tex.magFilter = THREE.NearestFilter;
+    
+    const bedrock_tex = loader.load('./resources/images/bedrock.jpg');;
+    bedrock_tex.magFilter = THREE.NearestFilter;
+
+    function makeInstance(type, pos=[0,0,0]) {
+        if (type=='blackstone') {
+            const blackstone_mat = new THREE.MeshPhongMaterial( {map: blackstone_tex} );
+            const block = new THREE.Mesh(blockG, blackstone_mat);
+            block.position.x = pos[0]; block.position.y = pos[1]; block.position.z = pos[2];
+            return block;
+        }
+        else if (type == 'obsidian') {
+            const obsidian_mat = new THREE.MeshPhongMaterial( {map: obsidian_tex} );
+            const block = new THREE.Mesh(blockG, obsidian_mat);
+            block.position.x = pos[0]; block.position.y = pos[1]; block.position.z = pos[2];
+            return block;
+        }
+        else if (type == 'crying_obsidian') {
+            const crying_obsidian_mat = new THREE.MeshPhongMaterial( {map: crying_obsidian_tex} );
+            const block = new THREE.Mesh(blockG, crying_obsidian_mat);
+            block.position.x = pos[0]; block.position.y = pos[1]; block.position.z = pos[2];
+            return block;
+        }
+        else if (type == 'bedrock') {
+            const bedrock_mat = new THREE.MeshPhongMaterial( {map: bedrock_tex} );
+            const block = new THREE.Mesh(blockG, bedrock_mat);
+            block.position.x = pos[0]; block.position.y = pos[1]; block.position.z = pos[2];
+            return block;
+        }
+        else {
+            console.log('Error: Invalid instance type');
+        }
+    }
+
+    function rollTexture(h) {
+        let rn = Math.random();
+        if (h == -1) { // debris
+            if (rn > 0.6) return 'bedrock';
+            else if (rn > 0.4) return 'crying_obsidian';
+            else return 'obsidian';
+        }
+        else if (h > 10) { // pillars
+            if (rn > 0.8) return 'crying_obsidian';
+            else if (rn > 0.75) return 'blackstone';
+            else return 'obsidian';
+        } else { // terrain
+            if (rn > 0.8) return 'obsidian';
+            else return 'blackstone';
+        }
+        return 'blackstone';
+    }
+
+    let map = [];
+    let terrain = new Array();
+
+    function generateTerrain(data, size) {
+        // Populate map with 0s
+        const H = size;
+        for (let i = 0; i < size; ++i) {
+            map.push([]);
+            for (let j = 0; j < size; ++j) {
+                map[i].push([]);
+                for (let k = 0; k < size; ++k) {
+                    map[i][j].push(0);
+                }
+            }
+        }
+        
+        // Fill out map with terrain
+        let x, y; x = y = 0;
+        const w = Math.floor(size/2);
+        for (let i = 0; i < data.length; i+=4) {
+            ++x;
+            console.log(`Generating world: ${Math.ceil((i/data.length) * 100.0)}%`);
+            const h = Math.floor(data[i] / 8); // 8 arbitrary scaling of pixel value
+            map[x][h][y] = 1;
+
+            if (x % (size-1) == 0) { 
+                x = 0; ++y; 
+            }
+            
+        }
+
+        // Read map
+        let c=0;
+        for (let x = 0; x < size; ++x) {
+            for (let h = 0; h < size; ++h) {
+                for (let y = 0; y < size; ++y) {
+                    if (map[x][h][y] == 1) {
+                        let type = rollTexture(h);
+                        let block = makeInstance(type, [x-w, h, y-w]);
+                        terrain.push(block);
+                        scene.add(block);
+                        ++c;
+                        for (let i = h-1; i > h-3; --i) { // 3 arbitrary height
+                            type = rollTexture(i);
+                            block = makeInstance(type, [x-w, i, y-w]);
+                            terrain.push(block);
+                            scene.add(block);
+                        }
+                    }
+                }
+            }
+        }
+        console.log(`Created ${c} blocks of terrain`);
+    }
+
+    function generateDebris(size, amount) {
+        for (let i = 0; i < amount; ++i) {
+            const h = Math.floor(Math.random()*5-25);
+            const x = 0;
+            const y = 0;
+            const type = rollTexture(-1);
+            let block = makeInstance(type, [x,h,y]);
+            debris.push(block);
+            scene.add( block );
+        }
+
+        // Directional Light
+        const color = 0x3333FF;
+        const intensity = 1;
+        const light = new THREE.DirectionalLight(color, intensity);
+        light.position.set(0,15,0);
+        light.target = debris[0];
+        scene.add(light);
+
+    }
+    
+    function createWorld() {
+        // Load height map
+        const img = new Image();
+        img.src = './resources/images/terrain.png';
+
+        img.onload = () => {
+            const size = img.width;
+            const canv = document.createElement('canvas');
+            canv.width = size; canv.height = size;
+            const ctx = canv.getContext('2d');
+            ctx.drawImage(img, 0,0);
+            const data = ctx.getImageData(0,0, size, size).data;
+            generateTerrain(data, size);
+
+            // Generate debris
+            generateDebris(size, 100);
+        }
+    }
+
+    function main() {
+        setupEvents();
+
+        // Create shapes
+        createWorld();
+
+        // Start rendering animation loop
+        requestAnimationFrame(render);
+    }
+
+    main();
+</script>
+
+
+</html>

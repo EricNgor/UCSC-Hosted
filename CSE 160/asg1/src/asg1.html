@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8"/>
+        <title>Assignment 1</title>
+        <style>
+            .slider {
+                -webkit-appearance: none;
+                background: white;
+            }
+        </style>
+    </head>
+   
+    <body onload="main()" style="background-color:#d1dbe9">
+        <canvas id="asg1" width="600" height="600">
+            Please use a browser that supports "canvas"
+        </canvas>
+
+        <br>
+        <label>Red</label>
+        <input type="range" id="rRange" value="0" class="slider"/>
+        <label>Green</label>
+        <input type="range" id="gRange" value="0" class="slider"/>
+        <label>Blue</label>
+        <input type="range" id="bRange" value="0" class="slider"/>
+        <label>Specific Color: </label>
+        <input type="checkbox" id="colorCheck"/>
+        <input type="color" id="color"/>
+
+        <br>
+        <label>Brush Size</label>
+        <input type="range" id="size" min="5" max="30" value="10" class="slider"/>
+        <label>Circle Segment Count</label>
+        <input type="range" id="segments" min="3" max="20" value="10" class="slider"/>
+        <output id="o_segments"></output>
+
+        <br>
+        <input type="radio" id="square" name="shape" value="square" checked/>
+        <label for='square'>Square</label>
+        <input type="radio" id="triangle" name="shape" value="triangle"/>
+        <label for='triangle'>Triangle</label>
+        <input type="radio" id="circle" name="shape" value="circle"/>
+        <label for='circle'>Circle</label>
+        <br>
+        <input type="radio" id="draw" name="brushMode" value="draw" checked/>
+        <label for="draw">Draw</label>
+        <input type="radio" id="erase" name="brushMode" value="erase"/>
+        <label for="erase">Erase</label>
+
+        <br>
+        <input type="button" id="clear" value="Clear"/>
+        
+        <br>
+        <p>
+            'Awesomeness' features:
+            <ul>
+                <li>HTML color specification</li>
+                <li>Eraser brush that scales with brush size</li>
+                <li>UI: Radio buttons, circle segment count display, colored background + brightened sliders </li>
+            </ul>
+        </p>
+
+        <script src="../lib/webgl-utils.js"></script>
+        <script src="../lib/webgl-debug.js"></script>
+        <script src="../lib/cuon-utils.js"></script>
+        <script src="Point.js"></script>
+        <script src="Triangle.js"></script>
+        <script src="Circle.js"></script>
+        <script src="asg1.js"></script>
+
+    </body>
+
+
+</html>

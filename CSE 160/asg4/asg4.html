@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Assignment 4</title>
+  </head>
+
+  <body onload="main()">
+    <canvas id="asg4" width="700" height="700">
+      Please use a browser that supports "canvas"
+    </canvas>
+
+    <br>
+    <table width="1000">
+      <thead><tr><th colspan="2"></th></tr></thead>
+      <body>
+        <tr>
+          <td>ms: <output id="ms"></output>
+              fps: <output id="fps"></output> 
+              Block count: <output id="numBlocks"></output>
+          </td>
+          <td> 
+            <input type="button" id="normalButton" value="Normals: OFF"/> 
+            <input type="button" id="lightButton" value="Lighting: ON"/>
+            <input type="button" id="lightDirButton" value="Directional Lighting: OFF"/>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            LightY <input type="number" id="lightY" min="0" max="1000" value="50"/>
+          </td>
+          <td>
+            Light Dir X: <input type="range" id="lightDirX" min="-1" max="1" step="0.01" value="0"/>
+            Light Dir Y: <input type="range" id="lightDirY" min="-1" max="1" step="0.01" value="0"/>
+            Light Dir Z: <input type="range" id="lightDirZ" min="-1" max="1" step="0.01" value="0"/>
+          </td>
+        </tr>
+        <tr>
+          <td> 
+            Light Speed: <input type="range" id="lightSpeed" min="0" max="4" step="0.1" value="1"/>
+          </td>
+          <td> Speed: <output id="speed"></output> </td>
+        </tr>
+        <tr>
+          <td> 
+          </td>
+        </tr>
+        <tr>
+          <td>
+            Roaming <input type="radio" id="roaming" checked/>
+            Walking <input type="radio" id="walking"/>
+            
+          </td>
+          <td>
+            None: <input type="radio" id="none" checked/>
+            Place/Destroy Blocks <input type="radio" id="editWorld"/>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            Coords: <output id="coords"></output> 
+            Facing: <output id="facing"></output>
+          </td>
+        </tr>
+      </body>
+    </table>
+
+    <p>
+      Controls:
+      <ul>
+        <li>Toggle Camera mode with 'c'</li>
+        <li>Toggle world interactions with 'r'</li>
+          <ul><li>Place with RMB, Destroy with LMB</li></ul>
+        <li>Use scroll wheel to change speed</li>
+      </ul>
+      Notes:
+      <ul>
+        <li>
+          When toggled on, directed light can be aimed with the corresponding sliders
+          <ul><li>The left halves of each slider point the light in the corresponding negative direction, while the right halves point in the positive direction</li></ul>
+        </li>
+      </ul>
+        
+    </p>
+
+    <script src="asg4.js"></script>
+    <script src="Cube.js"></script>
+    <script src="Triangle.js"></script>
+    <script src="Sphere.js"></script>
+    <script src="camera.js"></script>
+    <script src="input.js"></script>
+    <script src="world.js"></script>
+
+    <!-- Load external libraries -->
+    <script src="lib/cuon-matrix-cse160.js"></script>
+    <script src="lib/cuon-utils.js"></script>
+    <script src="lib/webgl-debug.js"></script>
+    <script src="lib/webgl-utils.js"></script>
+    <script src="lib/perlin.js"></script>
+  </body>
+</html>
